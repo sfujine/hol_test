@@ -414,6 +414,12 @@ Bob just realized: every time Alice ships a new agent or extends an existing one
 -- Delegate MG on the TRANSACTIONS schema to Alice's role — bounded least-privilege
 GRANT MANAGE GRANTS ON SCHEMA FINANCE_DB.TRANSACTIONS TO ROLE AGENT_DEV_ROLE;
 ```
+-- This still fails though Bob is the OWNER of the schema. Ownership does not guarantee delegation authority, Bob still needs explicit permissions to delegate
+USE ROLE ACCOUNTADMIN;
+GRANT MANAGE GRANTS on SCHEMA FINANCE_DB.TRANSACTIONS TO ROLE DB_ADMIN_FINANCE WITH GRANT OPTION;
+
+--re-run delegation and it now works
+GRANT MANAGE GRANTS ON SCHEMA FINANCE_DB.TRANSACTIONS TO ROLE AGENT_DEV_ROLE;
 
 That's it. Alice can now manage every grant inside `FINANCE_DB.TRANSACTIONS` — and only that schema. She still cannot touch any other database or schema.
 
