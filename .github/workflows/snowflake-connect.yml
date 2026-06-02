@@ -1,0 +1,24 @@
+name: Snowflake WIF Demo
+on:
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  connect:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Snowflake CLI with OIDC
+        uses: snowflakedb/snowflake-cli-action@v2.0
+        with:
+          use-oidc: true
+          cli-version: "3.14.0"
+      - name: Query Snowflake
+        env:
+          SNOWFLAKE_ACCOUNT: ${{ vars.SNOWFLAKE_ACCOUNT }}
+          SNOWFLAKE_USER: GITHUB_PIPELINE_SVC
+        run: |
+          snow sql -q "SELECT '✅ Connected without credentials! Payments count: ' || COUNT(*) AS result FROM FINANCE_DB.TRANSACTIONS.PAYMENTS" -x
